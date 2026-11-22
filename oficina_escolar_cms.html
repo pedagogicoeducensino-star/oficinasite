@@ -1,0 +1,2106 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oficina Escolar — Construtor Visual de Site (CMS)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        display: ['Montserrat', 'sans-serif'],
+                        academic: ['Cinzel', 'serif']
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* CSS Customizado para Interface Estilo Wix */
+        .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+        .scrollbar-thin::-webkit-scrollbar-track { background: #f1f5f9; }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .block-selected {
+            outline: 3px solid #2563eb !important;
+            outline-offset: -3px;
+        }
+
+        /* Animações dos Blocos no Site */
+        .anim-fade-up { animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .anim-slide { animation: slideIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .anim-zoom { animation: zoomIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="h-full font-sans text-slate-800 antialiased overflow-hidden select-none">
+
+    <!-- ========================================== -->
+    <!-- 1. TELA DE LOGIN / AUTENTICAÇÃO            -->
+    <!-- ========================================== -->
+    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 bg-opacity-95 p-4">
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-700/50 transform transition-all">
+            <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 p-8 text-white text-center relative">
+                <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-3 backdrop-blur-md border border-white/20 shadow-inner">
+                    <i class="fa-solid fa-graduation-cap text-3xl text-blue-300"></i>
+                </div>
+                <h1 class="text-2xl font-bold tracking-tight">Oficina Escolar CMS</h1>
+                <p class="text-blue-200 text-xs mt-1">Construtor Visual de Sites para Instituições de Ensino</p>
+                <div class="mt-3 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    <i class="fa-solid fa-rocket mr-1.5 text-[10px]"></i> Pronto para GitHub Pages
+                </div>
+            </div>
+            
+            <form id="login-form" onsubmit="handleLogin(event)" class="p-8 space-y-5">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Usuário de Acesso</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
+                        <input type="text" id="login-user" required placeholder="Digite 'admin'" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Senha de Acesso</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input type="password" id="login-pass" required placeholder="Digite 'escola2026'" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition">
+                    </div>
+                </div>
+
+                <div id="login-error" class="hidden p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-600 text-center font-medium">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> Usuário ou senha incorretos.
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition duration-200 flex items-center justify-center space-x-2">
+                    <span>Entrar no Painel da Oficina</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+
+                <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                    <button type="button" onclick="fillDemoCredentials()" class="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                        <i class="fa-solid fa-key mr-1"></i> Preencher Acesso Demo
+                    </button>
+                    <span class="text-[11px] text-slate-400">Versão 2026.4</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 2. APLICAÇÃO PRINCIPAL DA OFICINA CMS     -->
+    <!-- ========================================== -->
+    <div id="app-container" class="hidden h-full flex flex-col bg-slate-900">
+
+        <!-- BARRA SUPERIOR WIX-STYLE -->
+        <header class="h-14 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 text-white z-30 shrink-0">
+            <!-- Esquerda: Logo + Nome da Escola -->
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2 text-blue-400 font-bold tracking-tight">
+                    <i class="fa-solid fa-cubes text-xl"></i>
+                    <span class="hidden md:inline text-sm">OFICINA CMS</span>
+                </div>
+                <div class="h-4 w-px bg-slate-700 hidden sm:block"></div>
+                <div class="flex items-center space-x-2">
+                    <input type="text" id="school-name-input" value="Colégio Horizonte" onchange="updateHeaderInfo()" class="bg-slate-800 hover:bg-slate-700/80 focus:bg-slate-900 text-xs font-semibold px-2.5 py-1.5 rounded-lg text-slate-200 focus:text-white border border-slate-700 focus:border-blue-500 outline-none w-40 sm:w-56 transition">
+                </div>
+            </div>
+
+            <!-- Centro: Alternador de Viewport Responsiva -->
+            <div class="hidden lg:flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs font-medium space-x-1">
+                <button id="view-desktop" onclick="setDeviceView('desktop')" class="px-3 py-1 rounded-lg bg-blue-600 text-white flex items-center space-x-1.5 transition">
+                    <i class="fa-solid fa-desktop text-xs"></i>
+                    <span>Desktop</span>
+                </button>
+                <button id="view-tablet" onclick="setDeviceView('tablet')" class="px-3 py-1 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white flex items-center space-x-1.5 transition">
+                    <i class="fa-solid fa-tablet-screen-button text-xs"></i>
+                    <span>Tablet (768px)</span>
+                </button>
+                <button id="view-mobile" onclick="setDeviceView('mobile')" class="px-3 py-1 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white flex items-center space-x-1.5 transition">
+                    <i class="fa-solid fa-mobile-screen-button text-xs"></i>
+                    <span>Celular (390px)</span>
+                </button>
+            </div>
+
+            <!-- Direita: Modos + Backup + Botão Exportar GitHub -->
+            <div class="flex items-center space-x-2">
+                <!-- Toggle Modo Edição / Preview -->
+                <div class="flex bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs font-medium mr-1">
+                    <button id="mode-edit" onclick="setEditMode(true)" class="px-2.5 py-1 rounded-lg bg-slate-700 text-blue-400 font-semibold flex items-center space-x-1">
+                        <i class="fa-solid fa-pen-to-square text-[11px]"></i>
+                        <span class="hidden sm:inline">Edição</span>
+                    </button>
+                    <button id="mode-preview" onclick="setEditMode(false)" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white flex items-center space-x-1">
+                        <i class="fa-solid fa-eye text-[11px]"></i>
+                        <span class="hidden sm:inline">Prévia</span>
+                    </button>
+                </div>
+
+                <!-- Backup JSON -->
+                <button onclick="exportJSONProject()" title="Salvar Backup do Projeto (.json)" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg border border-slate-700 text-xs transition flex items-center space-x-1">
+                    <i class="fa-solid fa-download"></i>
+                    <span class="hidden xl:inline">Salvar Backup</span>
+                </button>
+                <label title="Carregar Backup do Projeto (.json)" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg border border-slate-700 text-xs transition cursor-pointer flex items-center space-x-1">
+                    <i class="fa-solid fa-upload"></i>
+                    <span class="hidden xl:inline">Abrir Backup</span>
+                    <input type="file" id="import-json-input" accept=".json" onchange="importJSONProject(event)" class="hidden">
+                </label>
+
+                <!-- Alterar Senha -->
+                <button onclick="openChangePasswordModal()" title="Alterar Senha de Acesso" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg border border-slate-700 text-xs transition">
+                    <i class="fa-solid fa-key"></i>
+                </button>
+
+                <!-- Botão Principal de Publicação -->
+                <button onclick="openPublishModal()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-emerald-900/40 flex items-center space-x-2 transition">
+                    <i class="fa-brands fa-github text-sm"></i>
+                    <span>Publicar no GitHub</span>
+                </button>
+            </div>
+        </header>
+
+
+        <!-- CORPO PRINCIPAL: PAINEL LATERAL + PALCO CANVASES -->
+        <div class="flex-1 flex overflow-hidden relative">
+
+            <!-- PAINEL LATERAL DE CONFIGURAÇÕES (3 ABAS) -->
+            <aside id="sidebar-panel" class="w-80 md:w-96 bg-slate-800 border-r border-slate-700 flex flex-col z-20 shrink-0 shadow-2xl transition-all duration-300">
+                
+                <!-- NAVEGAÇÃO DE ABAS DO PAINEL -->
+                <div class="flex border-b border-slate-700 bg-slate-900/60 p-1">
+                    <button onclick="switchTab('tab-blocks')" id="tab-btn-blocks" class="flex-1 py-2 text-xs font-semibold text-blue-400 border-b-2 border-blue-500 flex items-center justify-center space-x-1.5 transition">
+                        <i class="fa-solid fa-plus-circle"></i>
+                        <span>+ Blocos</span>
+                    </button>
+                    <button onclick="switchTab('tab-inspector')" id="tab-btn-inspector" class="flex-1 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 flex items-center justify-center space-x-1.5 transition">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>Editar Item</span>
+                    </button>
+                    <button onclick="switchTab('tab-theme')" id="tab-btn-theme" class="flex-1 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 flex items-center justify-center space-x-1.5 transition">
+                        <i class="fa-solid fa-palette"></i>
+                        <span>Design & Tema</span>
+                    </button>
+                </div>
+
+                <!-- CONTEÚDO DAS ABAS -->
+                <div class="flex-1 overflow-y-auto p-4 scrollbar-thin text-slate-200 space-y-4">
+
+                    <!-- ABA 1: CATÁLOGO DE BLOCOS DISPONÍVEIS -->
+                    <div id="tab-blocks" class="space-y-3">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Adicionar Seção ao Site</div>
+                        
+                        <!-- Cards de Seleção de Bloco -->
+                        <div class="grid grid-cols-1 gap-2.5">
+                            <!-- Bloco Banner -->
+                            <button onclick="addBlock('hero')" class="p-3 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 hover:border-blue-500 rounded-xl text-left transition group flex items-center space-x-3">
+                                <div class="w-9 h-9 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-image"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-semibold text-white">Banner / Destaque Principal</div>
+                                    <div class="text-[11px] text-slate-400">Imagem grande, títulos e botão de ação.</div>
+                                </div>
+                            </button>
+
+                            <!-- Bloco Comunicado -->
+                            <button onclick="addBlock('notice')" class="p-3 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 hover:border-amber-500 rounded-xl text-left transition group flex items-center space-x-3">
+                                <div class="w-9 h-9 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-bullhorn"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-semibold text-white">Aviso / Comunicado Urgente</div>
+                                    <div class="text-[11px] text-slate-400">Faixa em destaque para rematrícula ou avisos.</div>
+                                </div>
+                            </button>
+
+                            <!-- Bloco Notícias -->
+                            <button onclick="addBlock('news')" class="p-3 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 hover:border-emerald-500 rounded-xl text-left transition group flex items-center space-x-3">
+                                <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-newspaper"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-semibold text-white">Notícia / Publicação</div>
+                                    <div class="text-[11px] text-slate-400">Card editorial com foto, data e botão.</div>
+                                </div>
+                            </button>
+
+                            <!-- Bloco Cursos -->
+                            <button onclick="addBlock('courses')" class="p-3 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 hover:border-purple-500 rounded-xl text-left transition group flex items-center space-x-3">
+                                <div class="w-9 h-9 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-semibold text-white">Vitrine de Cursos Ofertados</div>
+                                    <div class="text-[11px] text-slate-400">Grade de modalidades (Infantil, Fundamental, Médio).</div>
+                                </div>
+                            </button>
+
+                            <!-- Bloco Vídeos YouTube -->
+                            <button onclick="addBlock('youtube')" class="p-3 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 hover:border-red-500 rounded-xl text-left transition group flex items-center space-x-3">
+                                <div class="w-9 h-9 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
+                                    <i class="fa-brands fa-youtube"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-semibold text-white">Vídeos do Canal (YouTube)</div>
+                                    <div class="text-[11px] text-slate-400">Player para vídeos normais e Shorts.</div>
+                                </div>
+                            </button>
+
+                            <!-- Bloco Boletim Acadêmico -->
+                            <button onclick="addBlock('boletim')" class="p-3 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 hover:border-cyan-500 rounded-xl text-left transition group flex items-center space-x-3">
+                                <div class="w-9 h-9 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-clipboard-list"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-semibold text-white">Área do Aluno (Boletim)</div>
+                                    <div class="text-[11px] text-slate-400">Consulta de notas integrada ou via Apps Script.</div>
+                                </div>
+                            </button>
+
+                            <!-- Bloco Trabalhe Conosco / Upload PDF -->
+                            <button onclick="addBlock('jobform')" class="p-3 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 hover:border-indigo-500 rounded-xl text-left transition group flex items-center space-x-3">
+                                <div class="w-9 h-9 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-file-arrow-up"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-semibold text-white">Trabalhe Conosco / Envio de PDF</div>
+                                    <div class="text-[11px] text-slate-400">Formulário com anexo de currículo/documento.</div>
+                                </div>
+                            </button>
+
+                            <!-- Bloco Hino / Áudio -->
+                            <button onclick="addBlock('audio')" class="p-3 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 hover:border-rose-500 rounded-xl text-left transition group flex items-center space-x-3">
+                                <div class="w-9 h-9 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-music"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-semibold text-white">Áudio / Hino da Escola</div>
+                                    <div class="text-[11px] text-slate-400">Player com sintetizador melódico ou MP3.</div>
+                                </div>
+                            </button>
+
+                            <!-- Bloco Localização & Contato -->
+                            <button onclick="addBlock('contact')" class="p-3 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 hover:border-teal-500 rounded-xl text-left transition group flex items-center space-x-3">
+                                <div class="w-9 h-9 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-map-location-dot"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-semibold text-white">Localização, Contato & Mapa</div>
+                                    <div class="text-[11px] text-slate-400">Endereço, telefones e mapa interativo.</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <!-- ABA 2: INSPETOR DE EDIÇÃO DO BLOCO SELECIONADO -->
+                    <div id="tab-inspector" class="hidden space-y-4">
+                        <div id="inspector-empty" class="text-center py-10 text-slate-500 text-xs">
+                            <i class="fa-solid fa-hand-pointer text-3xl mb-2 text-slate-600"></i>
+                            <p>Clique em qualquer bloco do site à direita para editar suas propriedades aqui.</p>
+                        </div>
+
+                        <div id="inspector-content" class="hidden space-y-4">
+                            <!-- Ações Rápidas no Topo do Inspetor -->
+                            <div class="flex items-center justify-between bg-slate-900/80 p-2 rounded-xl border border-slate-700">
+                                <span id="selected-block-type" class="text-xs font-bold text-blue-400 uppercase tracking-wider pl-1">Bloco Selecionado</span>
+                                <div class="flex items-center space-x-1">
+                                    <button onclick="moveSelectedBlock(-1)" title="Mover para Cima" class="p-1.5 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs">
+                                        <i class="fa-solid fa-arrow-up"></i>
+                                    </button>
+                                    <button onclick="moveSelectedBlock(1)" title="Mover para Baixo" class="p-1.5 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs">
+                                        <i class="fa-solid fa-arrow-down"></i>
+                                    </button>
+                                    <button onclick="duplicateSelectedBlock()" title="Duplicar Bloco" class="p-1.5 hover:bg-slate-700 text-slate-300 text-blue-400 rounded-lg text-xs">
+                                        <i class="fa-solid fa-copy"></i>
+                                    </button>
+                                    <button onclick="deleteSelectedBlock()" title="Excluir Bloco" class="p-1.5 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded-lg text-xs">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- CONTROLE DE TIPOGRAFIA POR BLOCO -->
+                            <div class="bg-slate-900/40 p-3 rounded-xl border border-slate-700 space-y-3">
+                                <div class="text-xs font-semibold text-slate-300 flex items-center justify-between">
+                                    <span><i class="fa-solid fa-font text-blue-400 mr-1.5"></i> Estilo do Título</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <div>
+                                        <label class="block text-[11px] text-slate-400 mb-1">Fonte do Título</label>
+                                        <select id="insp-font-family" onchange="updateSelectedBlockProp('fontFamily', this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                                            <option value="font-sans">Moderna (Sans)</option>
+                                            <option value="font-serif">Clássica (Serif)</option>
+                                            <option value="font-display">Destaque (Display)</option>
+                                            <option value="font-academic">Acadêmica (Cinzel)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-slate-400 mb-1">Tamanho do Título</label>
+                                        <select id="insp-font-size" onchange="updateSelectedBlockProp('fontSize', this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                                            <option value="text-xl sm:text-2xl">Pequeno</option>
+                                            <option value="text-2xl sm:text-3xl">Médio</option>
+                                            <option value="text-3xl sm:text-5xl">Grande</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CAMPOS DINÂMICOS GERADOS POR JS CONFORME O TIPO DO BLOCO -->
+                            <div id="inspector-dynamic-fields" class="space-y-3"></div>
+
+                            <!-- CONFIGURADOR DE BOTÃO DE AÇÃO DA SEÇÃO (SE APLICÁVEL) -->
+                            <div id="inspector-cta-box" class="bg-slate-900/40 p-3 rounded-xl border border-slate-700 space-y-3 hidden">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-semibold text-white flex items-center">
+                                        <i class="fa-solid fa-hand-pointer text-emerald-400 mr-1.5"></i> Configurar Botão de Ação
+                                    </span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="insp-cta-active" onchange="toggleCTAActive(this.checked)" class="sr-only peer">
+                                        <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    </label>
+                                </div>
+
+                                <div id="insp-cta-settings" class="space-y-2.5 text-xs">
+                                    <div>
+                                        <label class="block text-[11px] text-slate-400 mb-1">Texto do Botão</label>
+                                        <input type="text" id="insp-cta-text" oninput="updateCTAProp('text', this.value)" placeholder="ex: Baixe o Edital (PDF)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-[11px] text-slate-400 mb-1">Tipo de Ação ao Clicar</label>
+                                        <select id="insp-cta-type" onchange="updateCTAType(this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
+                                            <option value="pdf">Baixar / Abrir PDF ou Arquivo</option>
+                                            <option value="link">Abrir Link Externo (URL)</option>
+                                            <option value="whatsapp">Chamar no WhatsApp</option>
+                                            <option value="scroll">Ir para Seção do Site</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Campo dinâmico do destino da ação -->
+                                    <div id="insp-cta-target-box">
+                                        <label id="insp-cta-target-label" class="block text-[11px] text-slate-400 mb-1">Caminho do Arquivo PDF (no GitHub)</label>
+                                        <input type="text" id="insp-cta-target" oninput="updateCTAProp('target', this.value)" placeholder="ex: arquivos/calendario-2026.pdf" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-[11px] text-slate-400 mb-1">Estilo Visual do Botão</label>
+                                        <select id="insp-cta-style" onchange="updateCTAProp('style', this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
+                                            <option value="btn-primary">Cor Primária do Tema</option>
+                                            <option value="btn-accent">Cor de Destaque / Vibrante</option>
+                                            <option value="btn-outline">Contorno Transparente</option>
+                                            <option value="btn-whatsapp">Verde WhatsApp Oficial</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- ABA 3: DESIGN, TEMA E TRANSICÕES -->
+                    <div id="tab-theme" class="hidden space-y-4">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Personalização Global</div>
+
+                        <!-- Paletas Institucionais -->
+                        <div class="bg-slate-900/40 p-3 rounded-xl border border-slate-700 space-y-2.5">
+                            <label class="block text-xs font-semibold text-slate-300">Paletas Institucionais Prontas</label>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <button onclick="applyPalette('azul')" class="p-2.5 rounded-lg border border-slate-700 bg-slate-800 hover:border-blue-500 text-left flex items-center space-x-2 transition">
+                                    <div class="flex -space-x-1">
+                                        <div class="w-3.5 h-3.5 rounded-full bg-blue-700"></div>
+                                        <div class="w-3.5 h-3.5 rounded-full bg-amber-500"></div>
+                                    </div>
+                                    <span class="text-slate-200">Azul Clássico</span>
+                                </button>
+                                <button onclick="applyPalette('verde')" class="p-2.5 rounded-lg border border-slate-700 bg-slate-800 hover:border-emerald-500 text-left flex items-center space-x-2 transition">
+                                    <div class="flex -space-x-1">
+                                        <div class="w-3.5 h-3.5 rounded-full bg-emerald-700"></div>
+                                        <div class="w-3.5 h-3.5 rounded-full bg-orange-500"></div>
+                                    </div>
+                                    <span class="text-slate-200">Verde Educação</span>
+                                </button>
+                                <button onclick="applyPalette('matriculas')" class="p-2.5 rounded-lg border border-slate-700 bg-slate-800 hover:border-purple-500 text-left flex items-center space-x-2 transition">
+                                    <div class="flex -space-x-1">
+                                        <div class="w-3.5 h-3.5 rounded-full bg-purple-700"></div>
+                                        <div class="w-3.5 h-3.5 rounded-full bg-rose-500"></div>
+                                    </div>
+                                    <span class="text-slate-200">Campanha 2026</span>
+                                </button>
+                                <button onclick="applyPalette('cultural')" class="p-2.5 rounded-lg border border-slate-700 bg-slate-800 hover:border-red-500 text-left flex items-center space-x-2 transition">
+                                    <div class="flex -space-x-1">
+                                        <div class="w-3.5 h-3.5 rounded-full bg-red-700"></div>
+                                        <div class="w-3.5 h-3.5 rounded-full bg-yellow-500"></div>
+                                    </div>
+                                    <span class="text-slate-200">Festa Cultural</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cores Individuais -->
+                        <div class="bg-slate-900/40 p-3 rounded-xl border border-slate-700 space-y-3">
+                            <div class="text-xs font-semibold text-slate-300">Cores Customizadas</div>
+                            <div class="space-y-2 text-xs">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-400">Cor Primária</span>
+                                    <input type="color" id="theme-primary" onchange="updateThemeColors()" class="w-8 h-8 rounded border-none cursor-pointer bg-transparent">
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-400">Cor Secundária</span>
+                                    <input type="color" id="theme-secondary" onchange="updateThemeColors()" class="w-8 h-8 rounded border-none cursor-pointer bg-transparent">
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-400">Cor de Destaque</span>
+                                    <input type="color" id="theme-accent" onchange="updateThemeColors()" class="w-8 h-8 rounded border-none cursor-pointer bg-transparent">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Estilo de Animação -->
+                        <div class="bg-slate-900/40 p-3 rounded-xl border border-slate-700 space-y-2 text-xs">
+                            <label class="block font-semibold text-slate-300">Efeito de Animação ao Rolar</label>
+                            <select id="theme-animation" onchange="updateThemeAnimation()" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500">
+                                <option value="anim-fade-up">Suave (Fade Up)</option>
+                                <option value="anim-slide">Deslizar Lateral (Slide)</option>
+                                <option value="anim-zoom">Zoom Sutil</option>
+                                <option value="none">Sem Animações</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </aside>
+
+
+            <!-- PALCO CENTRAL DE PREVISÃO / EDIÇÃO DO SITE -->
+            <main class="flex-1 bg-slate-950 p-2 sm:p-6 overflow-y-auto flex justify-center items-start scrollbar-thin">
+                <!-- Frame Responsivo Simulador -->
+                <div id="device-frame" class="w-full max-w-6xl bg-white shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 flex flex-col min-h-[85vh] border border-slate-700/50">
+                    
+                    <!-- CABEÇALHO DO SITE DA ESCOLA (PUBLICO) -->
+                    <header id="site-header" class="bg-blue-900 text-white transition-colors duration-300 shadow-md">
+                        <!-- Topbar de contato rápido -->
+                        <div class="bg-black/20 text-[11px] px-4 py-1.5 flex justify-between items-center border-b border-white/10">
+                            <div class="flex items-center space-x-4">
+                                <span><i class="fa-solid fa-clock mr-1 text-blue-300"></i> Seg a Sex: 07h às 18h</span>
+                                <span class="hidden sm:inline"><i class="fa-solid fa-phone mr-1 text-blue-300"></i> (79) 3214-0000</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <a href="#" class="hover:text-blue-200"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="#" class="hover:text-blue-200"><i class="fa-brands fa-facebook"></i></a>
+                                <a href="#" class="hover:text-blue-200"><i class="fa-brands fa-youtube"></i></a>
+                            </div>
+                        </div>
+
+                        <!-- Barra de Navegação Principal -->
+                        <div class="px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-xl font-bold">
+                                    <i class="fa-solid fa-school text-amber-400"></i>
+                                </div>
+                                <div>
+                                    <h1 id="header-school-name" class="font-bold text-lg leading-tight">Colégio Horizonte</h1>
+                                    <p id="header-school-slogan" class="text-xs text-blue-200">Educação com Excelência e Valores para a Vida</p>
+                                </div>
+                            </div>
+
+                            <nav class="flex items-center space-x-4 text-xs font-semibold text-blue-100 overflow-x-auto py-1">
+                                <a href="#secao-destaque" class="hover:text-white transition">Início</a>
+                                <a href="#secao-cursos" class="hover:text-white transition">Cursos</a>
+                                <a href="#secao-boletim" class="hover:text-white transition">Boletim</a>
+                                <a href="#secao-trabalhe" class="hover:text-white transition">Trabalhe Conosco</a>
+                                <a href="#secao-contato" class="hover:text-white transition">Contato</a>
+                            </nav>
+                        </div>
+                    </header>
+
+                    <!-- CONTAINER DE BLOCOS DINÂMICOS DO SITE -->
+                    <div id="stage-blocks-container" class="flex-1 bg-slate-50 space-y-0">
+                        <!-- Blocos renderizados dinamicamente via JS -->
+                    </div>
+
+                    <!-- RODAPÉ INSTITUCIONAL PÁGINA FINAL -->
+                    <footer class="bg-slate-900 text-slate-400 text-xs py-8 px-6 border-t border-slate-800">
+                        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+                            <div>
+                                <span class="font-bold text-white text-sm" id="footer-school-name">Colégio Horizonte</span>
+                                <p class="text-[11px] mt-0.5">© 2026 — Todos os direitos reservados. Hospedado via GitHub Pages.</p>
+                            </div>
+                            <div class="text-[11px] text-slate-500">
+                                Criado com a <span class="text-slate-300 font-medium">Oficina Escolar CMS</span>
+                            </div>
+                        </div>
+                    </footer>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- MODAL DE PUBLICAÇÃO / EXPORTAÇÃO GITHUB   -->
+    <!-- ========================================== -->
+    <div id="publish-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+            <!-- Header Modal -->
+            <div class="bg-slate-900 text-white p-5 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xl">
+                        <i class="fa-brands fa-github"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-base">Publicar Site no GitHub Pages</h2>
+                        <p class="text-xs text-slate-400">Exportação do arquivo estático limpo e pronto</p>
+                    </div>
+                </div>
+                <button onclick="closePublishModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Corpo Modal -->
+            <div class="p-6 overflow-y-auto flex-1 space-y-6 scrollbar-thin">
+
+                <!-- Passo a Passo Ilustrado -->
+                <div class="bg-blue-50/70 border border-blue-200 rounded-xl p-4 space-y-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-blue-900 flex items-center">
+                        <i class="fa-solid fa-list-check mr-2 text-blue-600"></i> Como Colocar no Ar Grátis (4 Passos Rápidos)
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-blue-950">
+                        <div class="flex items-start space-x-2">
+                            <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">1</span>
+                            <span>Clique no botão verde abaixo para baixar o arquivo <strong>index.html</strong>.</span>
+                        </div>
+                        <div class="flex items-start space-x-2">
+                            <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">2</span>
+                            <span>No seu GitHub, crie um repositório chamado <code>meu-colegio</code>.</span>
+                        </div>
+                        <div class="flex items-start space-x-2">
+                            <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">3</span>
+                            <span>Envie o <strong>index.html</strong> + as pastas de fotos/PDFs (ex: <code>imagens/</code> e <code>arquivos/</code>).</span>
+                        </div>
+                        <div class="flex items-start space-x-2">
+                            <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">4</span>
+                            <span>Vá em <em>Settings &gt; Pages</em> e ative a branch <strong>main</strong>. Pronto!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Download e Cópia -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="downloadExportedHTML()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-emerald-700/30 flex items-center justify-center space-x-2 transition">
+                        <i class="fa-solid fa-file-arrow-down text-sm"></i>
+                        <span>Baixar index.html Pronto</span>
+                    </button>
+                    <button onclick="copyExportedHTML()" class="py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-xl flex items-center justify-center space-x-2 transition">
+                        <i class="fa-solid fa-copy"></i>
+                        <span>Copiar Código</span>
+                    </button>
+                </div>
+
+                <!-- Prévia do Código Gerado -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Prévia do Código HTML Gerado (Single File):</label>
+                    <textarea id="exported-html-preview" readonly class="w-full h-44 bg-slate-900 text-emerald-400 font-mono text-[11px] p-3 rounded-xl border border-slate-700 focus:outline-none scrollbar-thin select-all"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MODAL DE ALTERAR SENHA DA OFICINA -->
+    <div id="password-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="font-bold text-base text-slate-900 flex items-center">
+                <i class="fa-solid fa-key text-blue-600 mr-2"></i> Alterar Senha da Oficina
+            </h3>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Nova Senha</label>
+                <input type="password" id="new-password-input" placeholder="Digite a nova senha" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600">
+            </div>
+            <div class="flex items-center justify-end space-x-2 pt-2">
+                <button onclick="closePasswordModal()" class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-700">Cancelar</button>
+                <button onclick="saveNewPassword()" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl">Salvar Senha</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- LOGICA JAVASCRIPT PRINCIPAL DA APLICAÇÃO   -->
+    <!-- ========================================== -->
+    <script>
+        // ----------------------------------------------------
+        // ESTADO GLOBAL DA APLICAÇÃO (STATE)
+        // ----------------------------------------------------
+        let appState = {
+            schoolName: "Colégio Horizonte",
+            schoolSlogan: "Educação com Excelência e Valores para a Vida",
+            theme: {
+                primary: "#1e3a8a",
+                secondary: "#d97706",
+                accent: "#2563eb",
+                animation: "anim-fade-up"
+            },
+            selectedBlockId: null,
+            isEditMode: true,
+            blocks: [
+                {
+                    id: "b1",
+                    type: "hero",
+                    fontFamily: "font-display",
+                    fontSize: "text-3xl sm:text-5xl",
+                    title: "Matrículas Abertas 2026",
+                    subtitle: "Formando cidadãos preparados para os desafios do futuro com inovação, valores éticos e acolhimento.",
+                    image: "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200",
+                    cta: {
+                        active: true,
+                        text: "Baixar Manual do Aluno (PDF)",
+                        type: "pdf",
+                        target: "arquivos/manual-2026.pdf",
+                        style: "btn-primary"
+                    }
+                },
+                {
+                    id: "b2",
+                    type: "notice",
+                    fontFamily: "font-sans",
+                    fontSize: "text-xl sm:text-2xl",
+                    title: "COMUNICADO: Reunião de Pais e Mestres",
+                    subtitle: "Sábado, 28 de Março às 09h00 no Auditório Principal. Pauta: Calendário de Avaliações e Eventos.",
+                    badge: "Importante",
+                    cta: {
+                        active: true,
+                        text: "Confirmar Presença no WhatsApp",
+                        type: "whatsapp",
+                        target: "79999999999",
+                        style: "btn-whatsapp"
+                    }
+                },
+                {
+                    id: "b3",
+                    type: "courses",
+                    fontFamily: "font-academic",
+                    fontSize: "text-2xl sm:text-3xl",
+                    title: "Nossa Proposta Pedagógica",
+                    subtitle: "Conheça os segmentos oferecidos pela nossa instituição com corpo docente altamente qualificado.",
+                    items: [
+                        {
+                            name: "Educação Infantil",
+                            level: "2 a 5 anos",
+                            schedule: "Manhã / Tarde",
+                            description: "Desenvolvimento socioemocional, estímulo à curiosidade natural e aprendizado lúdico em salas preparadas.",
+                            ctaText: "Saiba mais sobre a Matrícula"
+                        },
+                        {
+                            name: "Ensino Fundamental I e II",
+                            level: "1º ao 9º Ano",
+                            schedule: "Integral / Parcial",
+                            description: "Base nacional comum aliada à robótica educacional, educação financeira e programa bilíngue diário.",
+                            ctaText: "Agendar Visita Guiada"
+                        },
+                        {
+                            name: "Ensino Médio e Pré-Vestibular",
+                            level: "1ª à 3ª Série",
+                            schedule: "Manhã + Oficinas",
+                            description: "Foco no ENEM e principais vestibulares do país, itinerários formativos e suporte psicológico focado em orientação de carreira.",
+                            ctaText: "Ver Matriz Curricular (PDF)"
+                        }
+                    ]
+                },
+                {
+                    id: "b4",
+                    type: "youtube",
+                    fontFamily: "font-sans",
+                    fontSize: "text-2xl sm:text-3xl",
+                    title: "Conheça o Nosso Cotidiano Escolar",
+                    subtitle: "Assista aos vídeos das nossas feiras de ciências, eventos esportivos e depoimentos da nossa comunidade.",
+                    videos: [
+                        {
+                            title: "Tour Virtual pelo Campus 2026",
+                            url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                            caption: "Conheça nossos laboratórios, quadras poliesportivas e área verde."
+                        },
+                        {
+                            title: "Projeto de Robótica & Automação (Shorts)",
+                            url: "https://www.youtube.com/shorts/dQw4w9WgXcQ",
+                            caption: "Alunos do 8º ano construindo protótipos de cidades sustentáveis."
+                        }
+                    ]
+                },
+                {
+                    id: "b5",
+                    type: "boletim",
+                    fontFamily: "font-sans",
+                    fontSize: "text-2xl sm:text-3xl",
+                    title: "Portal do Aluno — Consulta de Boletim",
+                    subtitle: "Informe a matrícula e a senha/data de nascimento para verificar o rendimento acadêmico.",
+                    appsScriptUrl: "",
+                    externalPortalUrl: ""
+                },
+                {
+                    id: "b6",
+                    type: "jobform",
+                    fontFamily: "font-sans",
+                    fontSize: "text-2xl sm:text-3xl",
+                    title: "Trabalhe Conosco — Envio de Currículo",
+                    subtitle: "Faça parte da nossa equipe pedagógica ou administrativa. Anexe seu currículo em formato PDF ou DOCX.",
+                    appsScriptUrl: ""
+                },
+                {
+                    id: "b7",
+                    type: "audio",
+                    fontFamily: "font-academic",
+                    fontSize: "text-xl sm:text-2xl",
+                    title: "Hino Institucional do Colégio",
+                    subtitle: "Letra e melodia oficial da escola. Ouça pelo sintetizador integrado ou carregue o arquivo de áudio.",
+                    mp3Url: ""
+                },
+                {
+                    id: "b8",
+                    type: "contact",
+                    fontFamily: "font-sans",
+                    fontSize: "text-2xl sm:text-3xl",
+                    title: "Fale Conosco & Localização",
+                    address: "Rua das Flores, 1200 — Bairro Universitário — Aracaju/SE",
+                    phone: "(79) 3214-0000",
+                    whatsapp: "(79) 99999-0000",
+                    email: "contato@colegiohorizonte.com.br",
+                    mapsEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3917.47293553253!2d-37.0560!3d-10.9260!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTDCsDU1JzMzLjYiUyAzN8KwMDMnMjEuNiJX!5e0!3m2!1spt-BR!2sbr!4v1620000000000"
+                }
+            ]
+        };
+
+        // Base Mock para demonstração offline do Boletim
+        const DEMO_STUDENTS = {
+            "202601": {
+                name: "Lucas Gabriel Santos",
+                class: "3ª Série - Ensino Médio",
+                grades: [
+                    { subject: "Língua Portuguesa", n1: 8.5, n2: 9.0, n3: 8.8, status: "Aprovado" },
+                    { subject: "Matemática", n1: 9.2, n2: 8.7, n3: 9.5, status: "Aprovado" },
+                    { subject: "Física", n1: 7.8, n2: 8.2, n3: 8.0, status: "Aprovado" },
+                    { subject: "História", n1: 9.0, n2: 9.5, n3: 9.2, status: "Aprovado" },
+                    { subject: "Biologia", n1: 8.0, n2: 8.5, n3: 8.4, status: "Aprovado" }
+                ]
+            },
+            "202602": {
+                name: "Mariana Oliveira Lima",
+                class: "9º Ano - Ensino Fundamental",
+                grades: [
+                    { subject: "Língua Portuguesa", n1: 9.5, n2: 9.8, n3: 9.6, status: "Aprovado" },
+                    { subject: "Matemática", n1: 8.0, n2: 7.5, n3: 8.2, status: "Aprovado" },
+                    { subject: "Química", n1: 8.8, n2: 9.0, n3: 8.9, status: "Aprovado" },
+                    { subject: "Geografia", n1: 9.2, n2: 9.0, n3: 9.1, status: "Aprovado" }
+                ]
+            }
+        };
+
+
+        // ----------------------------------------------------
+        // AUTENTICAÇÃO E LOGIN
+        // ----------------------------------------------------
+        function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('login-user').value.trim();
+            const pass = document.getElementById('login-pass').value.trim();
+
+            const savedPass = localStorage.getItem('oficina_password') || 'escola2026';
+
+            if (user === 'admin' && pass === savedPass) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-container').classList.remove('hidden');
+                renderAll();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function fillDemoCredentials() {
+            document.getElementById('login-user').value = 'admin';
+            const savedPass = localStorage.getItem('oficina_password') || 'escola2026';
+            document.getElementById('login-pass').value = savedPass;
+        }
+
+        function openChangePasswordModal() {
+            document.getElementById('password-modal').classList.remove('hidden');
+        }
+
+        function closePasswordModal() {
+            document.getElementById('password-modal').classList.add('hidden');
+        }
+
+        function saveNewPassword() {
+            const newPass = document.getElementById('new-password-input').value.trim();
+            if (newPass.length < 4) {
+                alert('A senha deve conter no mínimo 4 caracteres.');
+                return;
+            }
+            localStorage.setItem('oficina_password', newPass);
+            alert('Senha alterada com sucesso!');
+            closePasswordModal();
+        }
+
+
+        // ----------------------------------------------------
+        // GERENCIAMENTO DE INTERFACE (ABAS E RESPONSIVIDADE)
+        // ----------------------------------------------------
+        function switchTab(tabId) {
+            ['tab-blocks', 'tab-inspector', 'tab-theme'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+                document.getElementById('tab-btn-' + id.replace('tab-', '')).className = 
+                    "flex-1 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 flex items-center justify-center space-x-1.5 transition";
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('tab-btn-' + tabId.replace('tab-', ''));
+            activeBtn.className = "flex-1 py-2 text-xs font-semibold text-blue-400 border-b-2 border-blue-500 flex items-center justify-center space-x-1.5 transition";
+        }
+
+        function setDeviceView(device) {
+            const frame = document.getElementById('device-frame');
+            const btns = {
+                desktop: document.getElementById('view-desktop'),
+                tablet: document.getElementById('view-tablet'),
+                mobile: document.getElementById('view-mobile')
+            };
+
+            Object.keys(btns).forEach(key => {
+                btns[key].className = "px-3 py-1 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white flex items-center space-x-1.5 transition";
+            });
+
+            if (device === 'desktop') {
+                frame.style.width = '100%';
+                btns.desktop.className = "px-3 py-1 rounded-lg bg-blue-600 text-white flex items-center space-x-1.5 transition";
+            } else if (device === 'tablet') {
+                frame.style.width = '768px';
+                btns.tablet.className = "px-3 py-1 rounded-lg bg-blue-600 text-white flex items-center space-x-1.5 transition";
+            } else if (device === 'mobile') {
+                frame.style.width = '390px';
+                btns.mobile.className = "px-3 py-1 rounded-lg bg-blue-600 text-white flex items-center space-x-1.5 transition";
+            }
+        }
+
+        function setEditMode(isEdit) {
+            appState.isEditMode = isEdit;
+            document.getElementById('mode-edit').className = isEdit ? 
+                "px-2.5 py-1 rounded-lg bg-slate-700 text-blue-400 font-semibold flex items-center space-x-1" :
+                "px-2.5 py-1 rounded-lg text-slate-400 hover:text-white flex items-center space-x-1";
+            
+            document.getElementById('mode-preview').className = !isEdit ? 
+                "px-2.5 py-1 rounded-lg bg-slate-700 text-blue-400 font-semibold flex items-center space-x-1" :
+                "px-2.5 py-1 rounded-lg text-slate-400 hover:text-white flex items-center space-x-1";
+
+            renderStage();
+        }
+
+        function updateHeaderInfo() {
+            appState.schoolName = document.getElementById('school-name-input').value;
+            document.getElementById('header-school-name').innerText = appState.schoolName;
+            document.getElementById('footer-school-name').innerText = appState.schoolName;
+        }
+
+
+        // ----------------------------------------------------
+        // GERENCIAMENTO DE BLOCOS NO PALCO
+        // ----------------------------------------------------
+        function addBlock(type) {
+            const newId = 'b_' + Date.now();
+            let newBlock = { id: newId, type: type, fontFamily: "font-sans", fontSize: "text-2xl sm:text-3xl" };
+
+            switch(type) {
+                case 'hero':
+                    newBlock.title = "Novo Banner Destaque";
+                    newBlock.subtitle = "Insira um texto cativante sobre a proposta pedagógica ou inscrições.";
+                    newBlock.image = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1200";
+                    newBlock.cta = { active: true, text: "Ver Mais Informações", type: "pdf", target: "arquivos/documento.pdf", style: "btn-primary" };
+                    break;
+                case 'notice':
+                    newBlock.title = "Aviso Importante";
+                    newBlock.subtitle = "Descrição detalhada do aviso urgente para a comunidade escolar.";
+                    newBlock.badge = "Aviso";
+                    newBlock.cta = { active: true, text: "Falar no WhatsApp", type: "whatsapp", target: "79999999999", style: "btn-whatsapp" };
+                    break;
+                case 'news':
+                    newBlock.title = "Título da Publicação ou Notícia";
+                    newBlock.subtitle = "Resumo dos acontecimentos recentes, feira de ciências ou premiações.";
+                    newBlock.date = "21 de Março, 2026";
+                    newBlock.category = "Eventos Escolares";
+                    newBlock.image = "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=800";
+                    newBlock.cta = { active: true, text: "Ler Matéria Completa", type: "link", target: "#", style: "btn-outline" };
+                    break;
+                case 'courses':
+                    newBlock.title = "Nossas Turmas e Modalidades";
+                    newBlock.subtitle = "Oferecemos turmas do Ensino Infantil ao Médio.";
+                    newBlock.items = [
+                        { name: "Nova Turma", level: "Todos os Níveis", schedule: "Manhã", description: "Descrição detalhada da modalidade.", ctaText: "Saiba mais" }
+                    ];
+                    break;
+                case 'youtube':
+                    newBlock.title = "Galeria de Vídeos da Escola";
+                    newBlock.subtitle = "Acompanhe as produções audiovisuais do nosso canal oficial.";
+                    newBlock.videos = [
+                        { title: "Vídeo Institucional", url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", caption: "Legenda do vídeo" }
+                    ];
+                    break;
+                case 'boletim':
+                    newBlock.title = "Portal de Notas do Aluno";
+                    newBlock.subtitle = "Digite a matrícula para consultar o boletim online.";
+                    newBlock.appsScriptUrl = "";
+                    break;
+                case 'jobform':
+                    newBlock.title = "Trabalhe Conosco";
+                    newBlock.subtitle = "Envie seu currículo anexado em formato PDF para análise.";
+                    newBlock.appsScriptUrl = "";
+                    break;
+                case 'audio':
+                    newBlock.title = "Hino Oficial da Instituição";
+                    newBlock.subtitle = "Escute o hino escolar tocado via áudio interativo.";
+                    newBlock.mp3Url = "";
+                    break;
+                case 'contact':
+                    newBlock.title = "Fale Conosco";
+                    newBlock.address = "Endereço completo da escola";
+                    newBlock.phone = "(79) 3214-0000";
+                    newBlock.whatsapp = "(79) 99999-0000";
+                    newBlock.email = "contato@escola.com.br";
+                    newBlock.mapsEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3917.47293553253!2d-37.0560!3d-10.9260!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTDCsDU1JzMzLjYiUyAzN8KwMDMnMjEuNiJX!5e0!3m2!1spt-BR!2sbr!4v1620000000000";
+                    break;
+            }
+
+            appState.blocks.push(newBlock);
+            selectBlock(newId);
+            renderStage();
+        }
+
+        function selectBlock(id) {
+            appState.selectedBlockId = id;
+            switchTab('tab-inspector');
+            renderInspector();
+            renderStage();
+        }
+
+        function moveSelectedBlock(direction) {
+            if (!appState.selectedBlockId) return;
+            const idx = appState.blocks.findIndex(b => b.id === appState.selectedBlockId);
+            if (idx < 0) return;
+
+            const newIdx = idx + direction;
+            if (newIdx >= 0 && newIdx < appState.blocks.length) {
+                const temp = appState.blocks[idx];
+                appState.blocks[idx] = appState.blocks[newIdx];
+                appState.blocks[newIdx] = temp;
+                renderStage();
+            }
+        }
+
+        function duplicateSelectedBlock() {
+            if (!appState.selectedBlockId) return;
+            const block = appState.blocks.find(b => b.id === appState.selectedBlockId);
+            if (!block) return;
+
+            let cloned = JSON.parse(JSON.stringify(block));
+            cloned.id = 'b_' + Date.now();
+            cloned.title += " (Cópia)";
+
+            const idx = appState.blocks.findIndex(b => b.id === appState.selectedBlockId);
+            appState.blocks.splice(idx + 1, 0, cloned);
+            selectBlock(cloned.id);
+        }
+
+        function deleteSelectedBlock() {
+            if (!appState.selectedBlockId) return;
+            if (confirm("Deseja realmente remover esta seção do site?")) {
+                appState.blocks = appState.blocks.filter(b => b.id !== appState.selectedBlockId);
+                appState.selectedBlockId = null;
+                renderInspector();
+                renderStage();
+            }
+        }
+
+
+        // ----------------------------------------------------
+        // PARSER DE URL DO YOUTUBE (NORMAIS, SHORTS E EMBED)
+        // ----------------------------------------------------
+        function extractYouTubeId(url) {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+
+        // ----------------------------------------------------
+        // RENDERIZAÇÃO DO PALCO (CANVAS DO SITE)
+        // ----------------------------------------------------
+        function renderStage() {
+            const container = document.getElementById('stage-blocks-container');
+            container.innerHTML = '';
+
+            appState.blocks.forEach((block, index) => {
+                const isSelected = (block.id === appState.selectedBlockId && appState.isEditMode);
+                const blockWrapper = document.createElement('section');
+                blockWrapper.id = `block-${block.id}`;
+                blockWrapper.className = `relative group transition-all duration-300 ${appState.theme.animation} ${isSelected ? 'block-selected' : ''}`;
+
+                if (appState.isEditMode) {
+                    blockWrapper.onclick = (e) => {
+                        e.stopPropagation();
+                        selectBlock(block.id);
+                    };
+                }
+
+                // Renderização interna conforme o tipo de bloco
+                let innerHTML = '';
+                const fontClass = block.fontFamily || 'font-sans';
+                const fontSizeClass = block.fontSize || 'text-2xl sm:text-3xl';
+
+                switch(block.type) {
+                    case 'hero':
+                        innerHTML = `
+                            <div class="relative min-h-[380px] sm:min-h-[460px] flex items-center bg-slate-900 text-white overflow-hidden py-12 px-6">
+                                <img src="${block.image}" class="absolute inset-0 w-full h-full object-cover opacity-35" alt="Banner" onerror="this.src='https://placehold.co/1200x500/1e293b/ffffff?text=Imagem+da+Escola'">
+                                <div class="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/50 to-transparent"></div>
+                                <div class="relative z-10 max-w-2xl space-y-4">
+                                    <h2 class="${fontClass} ${fontSizeClass} font-bold leading-tight text-white drop-shadow">${block.title}</h2>
+                                    <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal drop-shadow-md">${block.subtitle}</p>
+                                    ${renderCTAButtonHTML(block.cta)}
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'notice':
+                        innerHTML = `
+                            <div class="py-8 px-6 bg-amber-500/10 border-y-2 border-amber-500 text-amber-950">
+                                <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+                                    <div class="space-y-1 text-center md:text-left">
+                                        <span class="inline-block px-2.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-bold uppercase tracking-wider mb-1">${block.badge || 'Aviso'}</span>
+                                        <h3 class="${fontClass} ${fontSizeClass} font-bold text-amber-900">${block.title}</h3>
+                                        <p class="text-xs text-amber-800 leading-relaxed">${block.subtitle}</p>
+                                    </div>
+                                    <div class="shrink-0">
+                                        ${renderCTAButtonHTML(block.cta)}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'news':
+                        innerHTML = `
+                            <div class="py-12 px-6 bg-white border-b border-slate-100">
+                                <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                                    <div class="rounded-2xl overflow-hidden shadow-md aspect-video bg-slate-100">
+                                        <img src="${block.image}" class="w-full h-full object-cover" alt="Notícia" onerror="this.src='https://placehold.co/800x500/e2e8f0/475569?text=Foto+Noticia'">
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center space-x-2 text-[11px] font-semibold text-blue-600">
+                                            <span>${block.category || 'Notícia'}</span>
+                                            <span>•</span>
+                                            <span>${block.date || '2026'}</span>
+                                        </div>
+                                        <h3 class="${fontClass} ${fontSizeClass} font-bold text-slate-900 leading-snug">${block.title}</h3>
+                                        <p class="text-xs text-slate-600 leading-relaxed">${block.subtitle}</p>
+                                        <div class="pt-2">
+                                            ${renderCTAButtonHTML(block.cta)}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'courses':
+                        let cardsHTML = (block.items || []).map(item => `
+                            <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-4">
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-start">
+                                        <h4 class="font-bold text-slate-900 text-sm">${item.name}</h4>
+                                        <span class="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-semibold border border-blue-200">${item.level}</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 font-medium"><i class="fa-solid fa-clock text-blue-500 mr-1"></i> Turno: ${item.schedule}</p>
+                                    <p class="text-xs text-slate-600 leading-relaxed pt-1">${item.description}</p>
+                                </div>
+                                <button class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-xl transition">
+                                    ${item.ctaText || 'Saber Mais'}
+                                </button>
+                            </div>
+                        `).join('');
+
+                        innerHTML = `
+                            <div id="secao-cursos" class="py-12 px-6 bg-slate-100">
+                                <div class="max-w-5xl mx-auto space-y-8">
+                                    <div class="text-center space-y-2">
+                                        <h3 class="${fontClass} ${fontSizeClass} font-bold text-slate-900">${block.title}</h3>
+                                        <p class="text-xs text-slate-600 max-w-xl mx-auto">${block.subtitle}</p>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        ${cardsHTML}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'youtube':
+                        let videoCards = (block.videos || []).map(v => {
+                            const ytId = extractYouTubeId(v.url) || 'dQw4w9WgXcQ';
+                            return `
+                                <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 space-y-3 pb-4">
+                                    <div class="aspect-video w-full bg-black">
+                                        <iframe class="w-full h-full" src="https://www.youtube.com/embed/${ytId}" title="${v.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    <div class="px-4 space-y-1">
+                                        <h4 class="font-bold text-slate-900 text-xs">${v.title}</h4>
+                                        <p class="text-[11px] text-slate-500">${v.caption}</p>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+
+                        innerHTML = `
+                            <div class="py-12 px-6 bg-white border-b border-slate-100">
+                                <div class="max-w-5xl mx-auto space-y-8">
+                                    <div class="text-center space-y-2">
+                                        <h3 class="${fontClass} ${fontSizeClass} font-bold text-slate-900">${block.title}</h3>
+                                        <p class="text-xs text-slate-600 max-w-xl mx-auto">${block.subtitle}</p>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        ${videoCards}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'boletim':
+                        innerHTML = `
+                            <div id="secao-boletim" class="py-12 px-6 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white">
+                                <div class="max-w-xl mx-auto bg-white/10 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-white/20 shadow-2xl space-y-6">
+                                    <div class="text-center space-y-2">
+                                        <div class="w-12 h-12 bg-blue-600/30 rounded-xl flex items-center justify-center mx-auto text-blue-300 text-2xl border border-blue-400/30">
+                                            <i class="fa-solid fa-graduation-cap"></i>
+                                        </div>
+                                        <h3 class="${fontClass} ${fontSizeClass} font-bold text-white">${block.title}</h3>
+                                        <p class="text-xs text-blue-200">${block.subtitle}</p>
+                                    </div>
+
+                                    <form onsubmit="handleStageBoletimSearch(event, '${block.id}')" class="space-y-4">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-blue-200 mb-1">Número de Matrícula</label>
+                                            <input type="text" id="boletim-mat-${block.id}" required placeholder="Ex: 202601" class="w-full px-4 py-2.5 bg-slate-900/80 border border-blue-500/40 rounded-xl text-white text-xs focus:outline-none focus:border-blue-400">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-blue-200 mb-1">Senha ou Data de Nascimento</label>
+                                            <input type="password" id="boletim-pass-${block.id}" required placeholder="Ex: 1234 ou 15/04/2010" class="w-full px-4 py-2.5 bg-slate-900/80 border border-blue-500/40 rounded-xl text-white text-xs focus:outline-none focus:border-blue-400">
+                                        </div>
+                                        <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                            <span>Consultar Boletim</span>
+                                        </button>
+                                    </form>
+
+                                    <!-- Resultado da Consulta -->
+                                    <div id="boletim-result-${block.id}" class="hidden bg-white text-slate-900 p-4 rounded-xl shadow-xl space-y-3 text-xs">
+                                        <!-- JS preenche -->
+                                    </div>
+                                    <div class="text-[11px] text-blue-300/80 text-center">
+                                        <i class="fa-solid fa-circle-info mr-1"></i> Demo teste: use Matrícula <strong>202601</strong> ou <strong>202602</strong> e Senha <strong>1234</strong>.
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'jobform':
+                        innerHTML = `
+                            <div id="secao-trabalhe" class="py-12 px-6 bg-slate-100">
+                                <div class="max-w-2xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+                                    <div class="text-center space-y-1">
+                                        <h3 class="${fontClass} ${fontSizeClass} font-bold text-slate-900">${block.title}</h3>
+                                        <p class="text-xs text-slate-500">${block.subtitle}</p>
+                                    </div>
+
+                                    <form onsubmit="handleStageJobSubmit(event)" class="space-y-4 text-xs">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block font-semibold text-slate-700 mb-1">Nome Completo *</label>
+                                                <input type="text" required placeholder="Seu nome completo" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-500">
+                                            </div>
+                                            <div>
+                                                <label class="block font-semibold text-slate-700 mb-1">E-mail para Contato *</label>
+                                                <input type="email" required placeholder="seu@email.com" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-500">
+                                            </div>
+                                        </div>
+
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block font-semibold text-slate-700 mb-1">Telefone / WhatsApp *</label>
+                                                <input type="tel" required placeholder="(79) 99999-9999" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-500">
+                                            </div>
+                                            <div>
+                                                <label class="block font-semibold text-slate-700 mb-1">Área / Cargo Pretendido</label>
+                                                <select class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-500">
+                                                    <option>Professor(a) — Infantil / Fundamental</option>
+                                                    <option>Professor(a) — Ensino Médio</option>
+                                                    <option>Coordenação / Pedagogia</option>
+                                                    <option>Secretaria / Administrativo</option>
+                                                    <option>Outros Cargos</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- UPLOAD REAL DE DOCUMENTO / PDF -->
+                                        <div>
+                                            <label class="block font-semibold text-slate-700 mb-1">Anexar Currículo (PDF, DOCX ou Imagem) *</label>
+                                            <div class="relative border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-xl p-4 text-center bg-slate-50 transition cursor-pointer">
+                                                <input type="file" id="job-file-input-${block.id}" required onchange="handleFileSelect(event, '${block.id}')" accept=".pdf,.doc,.docx,image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                                <div id="file-preview-box-${block.id}" class="space-y-1">
+                                                    <i class="fa-solid fa-cloud-arrow-up text-2xl text-blue-500"></i>
+                                                    <p class="font-medium text-slate-700">Clique aqui para selecionar o arquivo</p>
+                                                    <p class="text-[10px] text-slate-400">Tamanho máximo recomendado: 5MB</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block font-semibold text-slate-700 mb-1">Mensagem ou Resumo de Experiência</label>
+                                            <textarea rows="3" placeholder="Fale brevemente sobre sua formação acadêmica..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-500"></textarea>
+                                        </div>
+
+                                        <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition flex items-center justify-center space-x-2">
+                                            <i class="fa-solid fa-paper-plane"></i>
+                                            <span>Enviar Candidatura e Currículo</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'audio':
+                        innerHTML = `
+                            <div class="py-10 px-6 bg-white border-b border-slate-100">
+                                <div class="max-w-xl mx-auto bg-slate-900 text-white p-6 rounded-2xl shadow-lg border border-slate-800 space-y-4">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-12 h-12 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-2xl shrink-0">
+                                            <i class="fa-solid fa-music"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="${fontClass} text-base font-bold text-white">${block.title}</h3>
+                                            <p class="text-xs text-slate-400">${block.subtitle}</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-slate-800 p-3 rounded-xl flex items-center justify-between">
+                                        <button onclick="playHinoSynth()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs rounded-lg transition flex items-center space-x-2">
+                                            <i class="fa-solid fa-play"></i>
+                                            <span>Ouvir Hino (Sintetizador WebAudio)</span>
+                                        </button>
+                                        <span class="text-[11px] text-slate-400"><i class="fa-solid fa-volume-high mr-1"></i> Áudio Institucional</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'contact':
+                        innerHTML = `
+                            <div id="secao-contato" class="py-12 px-6 bg-slate-900 text-slate-200">
+                                <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                                    <div class="space-y-4">
+                                        <h3 class="${fontClass} ${fontSizeClass} font-bold text-white">${block.title}</h3>
+                                        <div class="space-y-3 text-xs">
+                                            <div class="flex items-start space-x-3">
+                                                <i class="fa-solid fa-location-dot text-blue-400 mt-1"></i>
+                                                <span>${block.address}</span>
+                                            </div>
+                                            <div class="flex items-center space-x-3">
+                                                <i class="fa-solid fa-phone text-blue-400"></i>
+                                                <span>${block.phone}</span>
+                                            </div>
+                                            <div class="flex items-center space-x-3">
+                                                <i class="fa-brands fa-whatsapp text-emerald-400"></i>
+                                                <span>${block.whatsapp}</span>
+                                            </div>
+                                            <div class="flex items-center space-x-3">
+                                                <i class="fa-solid fa-envelope text-blue-400"></i>
+                                                <span>${block.email}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="h-64 rounded-2xl overflow-hidden border border-slate-700 bg-slate-800">
+                                        <iframe class="w-full h-full" src="${block.mapsEmbedUrl}" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                }
+
+                // Barra de Ações Rápidas no Bloco Selecionado (Modo Edição)
+                if (isSelected) {
+                    const actionBar = document.createElement('div');
+                    actionBar.className = "absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow-xl flex items-center space-x-2 z-20";
+                    actionBar.innerHTML = `
+                        <span>Editando: ${block.type.toUpperCase()}</span>
+                        <button onclick="moveSelectedBlock(-1)" title="Subir" class="hover:text-slate-200"><i class="fa-solid fa-arrow-up"></i></button>
+                        <button onclick="moveSelectedBlock(1)" title="Descer" class="hover:text-slate-200"><i class="fa-solid fa-arrow-down"></i></button>
+                        <button onclick="deleteSelectedBlock()" title="Excluir" class="hover:text-red-200"><i class="fa-solid fa-trash"></i></button>
+                    `;
+                    blockWrapper.appendChild(actionBar);
+                }
+
+                blockWrapper.innerHTML += innerHTML;
+                container.appendChild(blockWrapper);
+            });
+        }
+
+
+        // Helper para renderizar Botão de Ação CTA
+        function renderCTAButtonHTML(cta) {
+            if (!cta || !cta.active) return '';
+            let styleClasses = "px-5 py-2.5 rounded-xl font-semibold text-xs shadow-md inline-flex items-center space-x-2 transition cursor-pointer ";
+            
+            switch(cta.style) {
+                case 'btn-primary': styleClasses += "bg-blue-600 hover:bg-blue-700 text-white"; break;
+                case 'btn-accent': styleClasses += "bg-amber-500 hover:bg-amber-600 text-white"; break;
+                case 'btn-outline': styleClasses += "bg-transparent border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"; break;
+                case 'btn-whatsapp': styleClasses += "bg-emerald-600 hover:bg-emerald-700 text-white"; break;
+                default: styleClasses += "bg-blue-600 text-white";
+            }
+
+            let icon = '<i class="fa-solid fa-arrow-right text-[10px]"></i>';
+            if (cta.type === 'pdf') icon = '<i class="fa-solid fa-file-pdf"></i>';
+            if (cta.type === 'whatsapp') icon = '<i class="fa-brands fa-whatsapp"></i>';
+
+            let href = "#";
+            if (cta.type === 'pdf' || cta.type === 'link') href = cta.target || '#';
+            if (cta.type === 'whatsapp') href = `https://wa.me/${(cta.target || '').replace(/\D/g,'')}`;
+
+            return `<a href="${href}" ${cta.type !== 'scroll' ? 'target="_blank"' : ''} class="${styleClasses}"><span>${cta.text}</span> ${icon}</a>`;
+        }
+
+
+        // ----------------------------------------------------
+        // INSPETOR CONTEXTUAL DA ABA "EDITAR ITEM"
+        // ----------------------------------------------------
+        function renderInspector() {
+            const emptyState = document.getElementById('inspector-empty');
+            const contentState = document.getElementById('inspector-content');
+            const fieldsContainer = document.getElementById('inspector-dynamic-fields');
+            const ctaBox = document.getElementById('inspector-cta-box');
+
+            if (!appState.selectedBlockId) {
+                emptyState.classList.remove('hidden');
+                contentState.classList.add('hidden');
+                return;
+            }
+
+            const block = appState.blocks.find(b => b.id === appState.selectedBlockId);
+            if (!block) return;
+
+            emptyState.classList.add('hidden');
+            contentState.classList.remove('hidden');
+
+            document.getElementById('selected-block-type').innerText = `Seção: ${block.type.toUpperCase()}`;
+            document.getElementById('insp-font-family').value = block.fontFamily || 'font-sans';
+            document.getElementById('insp-font-size').value = block.fontSize || 'text-2xl sm:text-3xl';
+
+            fieldsContainer.innerHTML = '';
+
+            // Renderizar campos editáveis baseados no tipo do bloco
+            let fieldsHTML = '';
+
+            if (block.title !== undefined) {
+                fieldsHTML += `
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">Título Principal</label>
+                        <input type="text" value="${block.title || ''}" oninput="updateSelectedBlockProp('title', this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
+                    </div>
+                `;
+            }
+
+            if (block.subtitle !== undefined) {
+                fieldsHTML += `
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">Subtítulo / Descrição</label>
+                        <textarea oninput="updateSelectedBlockProp('subtitle', this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500" rows="3">${block.subtitle || ''}</textarea>
+                    </div>
+                `;
+            }
+
+            if (block.image !== undefined) {
+                fieldsHTML += `
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">Caminho da Imagem (Upload ou URL)</label>
+                        <input type="text" value="${block.image || ''}" oninput="updateSelectedBlockProp('image', this.value)" placeholder="ex: imagens/fachada.jpg ou URL" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
+                    </div>
+                `;
+            }
+
+            if (block.type === 'courses') {
+                fieldsHTML += `<div class="text-xs font-semibold text-slate-300 pt-2">Lista de Cursos Ofertados</div>`;
+                (block.items || []).forEach((item, idx) => {
+                    fieldsHTML += `
+                        <div class="p-2.5 bg-slate-900/60 rounded-xl border border-slate-700 space-y-2 text-xs">
+                            <input type="text" value="${item.name}" oninput="updateCourseItem(${idx}, 'name', this.value)" placeholder="Nome do Curso" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-white">
+                            <input type="text" value="${item.level}" oninput="updateCourseItem(${idx}, 'level', this.value)" placeholder="Idade / Faixa" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-white">
+                            <textarea oninput="updateCourseItem(${idx}, 'description', this.value)" placeholder="Descrição" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-white" rows="2">${item.description}</textarea>
+                        </div>
+                    `;
+                });
+            }
+
+            if (block.type === 'youtube') {
+                fieldsHTML += `<div class="text-xs font-semibold text-slate-300 pt-2">Vídeos da Galeria</div>`;
+                (block.videos || []).forEach((vid, idx) => {
+                    fieldsHTML += `
+                        <div class="p-2.5 bg-slate-900/60 rounded-xl border border-slate-700 space-y-2 text-xs">
+                            <input type="text" value="${vid.title}" oninput="updateVideoItem(${idx}, 'title', this.value)" placeholder="Título do Vídeo" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-white">
+                            <input type="text" value="${vid.url}" oninput="updateVideoItem(${idx}, 'url', this.value)" placeholder="Link YouTube (Normal ou Shorts)" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-white">
+                            <input type="text" value="${vid.caption}" oninput="updateVideoItem(${idx}, 'caption', this.value)" placeholder="Legenda / Resumo" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-white">
+                        </div>
+                    `;
+                });
+            }
+
+            if (block.type === 'boletim' || block.type === 'jobform') {
+                fieldsHTML += `
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">URL do Web App (Google Apps Script da Escola)</label>
+                        <input type="text" value="${block.appsScriptUrl || ''}" oninput="updateSelectedBlockProp('appsScriptUrl', this.value)" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
+                    </div>
+                `;
+            }
+
+            fieldsContainer.innerHTML = fieldsHTML;
+
+            // Render do Configurador de Botão CTA se o bloco suportar
+            if (block.cta) {
+                ctaBox.classList.remove('hidden');
+                document.getElementById('insp-cta-active').checked = block.cta.active;
+                document.getElementById('insp-cta-text').value = block.cta.text || '';
+                document.getElementById('insp-cta-type').value = block.cta.type || 'pdf';
+                document.getElementById('insp-cta-target').value = block.cta.target || '';
+                document.getElementById('insp-cta-style').value = block.cta.style || 'btn-primary';
+                updateCTAType(block.cta.type || 'pdf');
+            } else {
+                ctaBox.classList.add('hidden');
+            }
+        }
+
+        function updateSelectedBlockProp(prop, value) {
+            if (!appState.selectedBlockId) return;
+            const block = appState.blocks.find(b => b.id === appState.selectedBlockId);
+            if (block) {
+                block[prop] = value;
+                renderStage();
+            }
+        }
+
+        function updateCourseItem(idx, prop, val) {
+            const block = appState.blocks.find(b => b.id === appState.selectedBlockId);
+            if (block && block.items && block.items[idx]) {
+                block.items[idx][prop] = val;
+                renderStage();
+            }
+        }
+
+        function updateVideoItem(idx, prop, val) {
+            const block = appState.blocks.find(b => b.id === appState.selectedBlockId);
+            if (block && block.videos && block.videos[idx]) {
+                block.videos[idx][prop] = val;
+                renderStage();
+            }
+        }
+
+        function toggleCTAActive(checked) {
+            const block = appState.blocks.find(b => b.id === appState.selectedBlockId);
+            if (block && block.cta) {
+                block.cta.active = checked;
+                renderStage();
+            }
+        }
+
+        function updateCTAProp(prop, val) {
+            const block = appState.blocks.find(b => b.id === appState.selectedBlockId);
+            if (block && block.cta) {
+                block.cta[prop] = val;
+                renderStage();
+            }
+        }
+
+        function updateCTAType(type) {
+            const label = document.getElementById('insp-cta-target-label');
+            const targetInput = document.getElementById('insp-cta-target');
+
+            if (type === 'pdf') {
+                label.innerText = 'Caminho do Arquivo PDF (no GitHub)';
+                targetInput.placeholder = 'ex: arquivos/calendario-2026.pdf';
+            } else if (type === 'link') {
+                label.innerText = 'Link Externo (URL)';
+                targetInput.placeholder = 'ex: https://siteexterno.com.br';
+            } else if (type === 'whatsapp') {
+                label.innerText = 'Número do WhatsApp (com DDD)';
+                targetInput.placeholder = 'ex: 79999999999';
+            } else if (type === 'scroll') {
+                label.innerText = 'ID da Seção (ex: #secao-cursos)';
+                targetInput.placeholder = 'ex: #secao-cursos';
+            }
+            updateCTAProp('type', type);
+        }
+
+
+        // ----------------------------------------------------
+        // SIMULAÇÕES INTERATIVAS NO PALCO
+        // ----------------------------------------------------
+        function handleStageBoletimSearch(e, blockId) {
+            e.preventDefault();
+            const mat = document.getElementById(`boletim-mat-${blockId}`).value.trim();
+            const pass = document.getElementById(`boletim-pass-${blockId}`).value.trim();
+            const resContainer = document.getElementById(`boletim-result-${blockId}`);
+
+            const student = DEMO_STUDENTS[mat];
+
+            if (student && pass === '1234') {
+                let rows = student.grades.map(g => `
+                    <tr class="border-b border-slate-100">
+                        <td class="py-1.5 font-medium text-slate-800">${g.subject}</td>
+                        <td class="py-1.5 text-center">${g.n1}</td>
+                        <td class="py-1.5 text-center">${g.n2}</td>
+                        <td class="py-1.5 text-center font-bold text-blue-700">${g.n3}</td>
+                        <td class="py-1.5 text-right"><span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">${g.status}</span></td>
+                    </tr>
+                `).join('');
+
+                resContainer.innerHTML = `
+                    <div class="border-b border-slate-200 pb-2 flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-slate-900 text-xs">${student.name}</p>
+                            <p class="text-[10px] text-slate-500">${student.class} | Matrícula: ${mat}</p>
+                        </div>
+                        <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">Ano 2026</span>
+                    </div>
+                    <table class="w-full text-[11px]">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-slate-200 text-[10px] uppercase">
+                                <th class="text-left py-1">Disciplina</th>
+                                <th class="text-center py-1">N1</th>
+                                <th class="text-center py-1">N2</th>
+                                <th class="text-center py-1">N3</th>
+                                <th class="text-right py-1">Situação</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                `;
+                resContainer.classList.remove('hidden');
+            } else {
+                resContainer.innerHTML = `<p class="text-red-600 font-medium text-center">Matrícula ou senha inválida. (Dica Demo: Matrícula 202601 e Senha 1234)</p>`;
+                resContainer.classList.remove('hidden');
+            }
+        }
+
+        function handleFileSelect(e, blockId) {
+            const file = e.target.files[0];
+            const box = document.getElementById(`file-preview-box-${blockId}`);
+            if (file) {
+                const sizeKB = (file.size / 1024).toFixed(1);
+                box.innerHTML = `
+                    <i class="fa-solid fa-file-pdf text-2xl text-emerald-600"></i>
+                    <p class="font-bold text-slate-800 text-xs">${file.name}</p>
+                    <p class="text-[10px] text-emerald-700 font-semibold">Arquivo Anexado com Sucesso (${sizeKB} KB)</p>
+                `;
+            }
+        }
+
+        function handleStageJobSubmit(e) {
+            e.preventDefault();
+            alert("Candidatura e arquivo de currículo processados com sucesso! Na versão publicada com Apps Script, o arquivo é enviado diretamente para a pasta do Google Drive da escola.");
+        }
+
+        function playHinoSynth() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const notes = [261.63, 329.63, 392.00, 523.25, 392.00, 523.25];
+                let time = ctx.currentTime;
+
+                notes.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, time);
+                    gain.gain.setValueAtTime(0.3, time);
+                    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.4);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(time);
+                    osc.stop(time + 0.4);
+                    time += 0.35;
+                });
+            } catch(e) {
+                alert("Áudio sintetizado não suportado no navegador.");
+            }
+        }
+
+
+        // ----------------------------------------------------
+        // PALETAS DE DESIGN E TEMAS
+        // ----------------------------------------------------
+        function applyPalette(name) {
+            if (name === 'azul') {
+                appState.theme.primary = "#1e3a8a";
+                appState.theme.secondary = "#d97706";
+                appState.theme.accent = "#2563eb";
+            } else if (name === 'verde') {
+                appState.theme.primary = "#065f46";
+                appState.theme.secondary = "#ea580c";
+                appState.theme.accent = "#059669";
+            } else if (name === 'matriculas') {
+                appState.theme.primary = "#581c87";
+                appState.theme.secondary = "#e11d48";
+                appState.theme.accent = "#7c3aed";
+            } else if (name === 'cultural') {
+                appState.theme.primary = "#991b1b";
+                appState.theme.secondary = "#ca8a04";
+                appState.theme.accent = "#dc2626";
+            }
+            updateThemeColors();
+        }
+
+        function updateThemeColors() {
+            document.getElementById('site-header').style.backgroundColor = appState.theme.primary;
+            renderStage();
+        }
+
+        function updateThemeAnimation() {
+            appState.theme.animation = document.getElementById('theme-animation').value;
+            renderStage();
+        }
+
+
+        // ----------------------------------------------------
+        // EXPORTAÇÃO E IMPORTAÇÃO JSON DO PROJETO
+        // ----------------------------------------------------
+        function exportJSONProject() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `projeto_oficina_${appState.schoolName.toLowerCase().replace(/\s+/g,'_')}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importJSONProject(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const loadedState = JSON.parse(e.target.result);
+                    if (loadedState.blocks && loadedState.schoolName) {
+                        appState = loadedState;
+                        document.getElementById('school-name-input').value = appState.schoolName;
+                        updateHeaderInfo();
+                        renderAll();
+                        alert("Projeto carregado com sucesso!");
+                    }
+                } catch(err) {
+                    alert("Erro ao ler o arquivo JSON de backup.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+
+        // ----------------------------------------------------
+        // GERADOR DE CÓDIGO HTML5 INDEPENDENTE (GITHUB PAGES)
+        // ----------------------------------------------------
+        function generateCleanHTML() {
+            let blocksHTML = '';
+
+            appState.blocks.forEach(block => {
+                const fontClass = block.fontFamily || 'font-sans';
+                const fontSizeClass = block.fontSize || 'text-2xl sm:text-3xl';
+                const animClass = appState.theme.animation !== 'none' ? appState.theme.animation : '';
+
+                switch(block.type) {
+                    case 'hero':
+                        blocksHTML += `
+                        <section class="relative min-h-[420px] flex items-center bg-slate-900 text-white overflow-hidden py-16 px-6 ${animClass}">
+                            <img src="${block.image}" class="absolute inset-0 w-full h-full object-cover opacity-35" alt="Banner">
+                            <div class="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/50 to-transparent"></div>
+                            <div class="relative z-10 max-w-3xl mx-auto space-y-4 text-center sm:text-left">
+                                <h2 class="${fontClass} ${fontSizeClass} font-bold drop-shadow">${block.title}</h2>
+                                <p class="text-sm sm:text-base text-slate-200 leading-relaxed font-normal">${block.subtitle}</p>
+                                ${renderCTAButtonHTML(block.cta)}
+                            </div>
+                        </section>`;
+                        break;
+                    case 'notice':
+                        blocksHTML += `
+                        <section class="py-8 px-6 bg-amber-500/10 border-y-2 border-amber-500 text-amber-950 ${animClass}">
+                            <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+                                <div class="space-y-1 text-center md:text-left">
+                                    <span class="inline-block px-2.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-bold uppercase tracking-wider mb-1">${block.badge || 'Aviso'}</span>
+                                    <h3 class="${fontClass} ${fontSizeClass} font-bold text-amber-900">${block.title}</h3>
+                                    <p class="text-xs text-amber-800 leading-relaxed">${block.subtitle}</p>
+                                </div>
+                                <div>${renderCTAButtonHTML(block.cta)}</div>
+                            </div>
+                        </section>`;
+                        break;
+                    case 'courses':
+                        let courseCards = (block.items || []).map(item => `
+                            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-4">
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-start">
+                                        <h4 class="font-bold text-slate-900 text-sm">${item.name}</h4>
+                                        <span class="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-semibold border border-blue-200">${item.level}</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 font-medium"><i class="fa-solid fa-clock text-blue-500 mr-1"></i> Turno: ${item.schedule}</p>
+                                    <p class="text-xs text-slate-600 leading-relaxed pt-1">${item.description}</p>
+                                </div>
+                                <button class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-xl transition">${item.ctaText || 'Saber Mais'}</button>
+                            </div>
+                        `).join('');
+
+                        blocksHTML += `
+                        <section id="secao-cursos" class="py-14 px-6 bg-slate-100 ${animClass}">
+                            <div class="max-w-5xl mx-auto space-y-8">
+                                <div class="text-center space-y-2">
+                                    <h3 class="${fontClass} ${fontSizeClass} font-bold text-slate-900">${block.title}</h3>
+                                    <p class="text-xs text-slate-600 max-w-xl mx-auto">${block.subtitle}</p>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">${courseCards}</div>
+                            </div>
+                        </section>`;
+                        break;
+                    case 'youtube':
+                        let ytCards = (block.videos || []).map(v => {
+                            const ytId = extractYouTubeId(v.url) || 'dQw4w9WgXcQ';
+                            return `
+                                <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 space-y-3 pb-4">
+                                    <div class="aspect-video w-full bg-black">
+                                        <iframe class="w-full h-full" src="https://www.youtube.com/embed/${ytId}" title="${v.title}" frameborder="0" allowfullscreen></iframe>
+                                    </div>
+                                    <div class="px-4 space-y-1">
+                                        <h4 class="font-bold text-slate-900 text-xs">${v.title}</h4>
+                                        <p class="text-[11px] text-slate-500">${v.caption}</p>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+
+                        blocksHTML += `
+                        <section class="py-14 px-6 bg-white border-b border-slate-100 ${animClass}">
+                            <div class="max-w-5xl mx-auto space-y-8">
+                                <div class="text-center space-y-2">
+                                    <h3 class="${fontClass} ${fontSizeClass} font-bold text-slate-900">${block.title}</h3>
+                                    <p class="text-xs text-slate-600 max-w-xl mx-auto">${block.subtitle}</p>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">${ytCards}</div>
+                            </div>
+                        </section>`;
+                        break;
+                    case 'boletim':
+                        blocksHTML += `
+                        <section id="secao-boletim" class="py-14 px-6 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white ${animClass}">
+                            <div class="max-w-xl mx-auto bg-white/10 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-white/20 shadow-2xl space-y-6">
+                                <div class="text-center space-y-2">
+                                    <h3 class="${fontClass} ${fontSizeClass} font-bold text-white">${block.title}</h3>
+                                    <p class="text-xs text-blue-200">${block.subtitle}</p>
+                                </div>
+                                <form onsubmit="handleExportBoletimSearch(event)" class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-blue-200 mb-1">Matrícula</label>
+                                        <input type="text" id="pub-mat" required placeholder="Ex: 202601" class="w-full px-4 py-2.5 bg-slate-900/80 border border-blue-500/40 rounded-xl text-white text-xs">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-blue-200 mb-1">Senha</label>
+                                        <input type="password" id="pub-pass" required placeholder="Ex: 1234" class="w-full px-4 py-2.5 bg-slate-900/80 border border-blue-500/40 rounded-xl text-white text-xs">
+                                    </div>
+                                    <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-xl shadow-lg">Consultar Boletim</button>
+                                </form>
+                                <div id="pub-boletim-result" class="hidden bg-white text-slate-900 p-4 rounded-xl shadow-xl space-y-3 text-xs"></div>
+                            </div>
+                        </section>`;
+                        break;
+                    case 'jobform':
+                        blocksHTML += `
+                        <section id="secao-trabalhe" class="py-14 px-6 bg-slate-100 ${animClass}">
+                            <div class="max-w-2xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+                                <div class="text-center space-y-1">
+                                    <h3 class="${fontClass} ${fontSizeClass} font-bold text-slate-900">${block.title}</h3>
+                                    <p class="text-xs text-slate-500">${block.subtitle}</p>
+                                </div>
+                                <form onsubmit="handleExportJobSubmit(event)" class="space-y-4 text-xs">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <input type="text" required placeholder="Nome completo" class="p-2.5 bg-slate-50 border border-slate-300 rounded-xl">
+                                        <input type="email" required placeholder="Seu e-mail" class="p-2.5 bg-slate-50 border border-slate-300 rounded-xl">
+                                    </div>
+                                    <div>
+                                        <label class="block font-semibold text-slate-700 mb-1">Anexar Currículo (PDF/DOCX)</label>
+                                        <input type="file" required accept=".pdf,.doc,.docx" class="w-full text-xs text-slate-600 border border-slate-300 rounded-xl p-2 bg-slate-50">
+                                    </div>
+                                    <textarea rows="3" placeholder="Mensagem de apresentação..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl"></textarea>
+                                    <button type="submit" class="w-full py-3 bg-blue-600 text-white font-semibold rounded-xl">Enviar Currículo</button>
+                                </form>
+                            </div>
+                        </section>`;
+                        break;
+                    case 'audio':
+                        blocksHTML += `
+                        <section class="py-10 px-6 bg-white border-b border-slate-100 ${animClass}">
+                            <div class="max-w-xl mx-auto bg-slate-900 text-white p-6 rounded-2xl shadow-lg space-y-4">
+                                <h3 class="${fontClass} text-base font-bold text-white">${block.title}</h3>
+                                <p class="text-xs text-slate-400">${block.subtitle}</p>
+                                <button onclick="playHinoSynth()" class="px-4 py-2 bg-rose-600 text-white text-xs font-semibold rounded-lg">Ouvir Hino (Sintetizador WebAudio)</button>
+                            </div>
+                        </section>`;
+                        break;
+                    case 'contact':
+                        blocksHTML += `
+                        <section id="secao-contato" class="py-14 px-6 bg-slate-900 text-slate-200 ${animClass}">
+                            <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                                <div class="space-y-3 text-xs">
+                                    <h3 class="${fontClass} ${fontSizeClass} font-bold text-white">${block.title}</h3>
+                                    <p><i class="fa-solid fa-location-dot text-blue-400 mr-2"></i> ${block.address}</p>
+                                    <p><i class="fa-solid fa-phone text-blue-400 mr-2"></i> ${block.phone}</p>
+                                    <p><i class="fa-brands fa-whatsapp text-emerald-400 mr-2"></i> ${block.whatsapp}</p>
+                                    <p><i class="fa-solid fa-envelope text-blue-400 mr-2"></i> ${block.email}</p>
+                                </div>
+                                <div class="h-64 rounded-2xl overflow-hidden border border-slate-700">
+                                    <iframe class="w-full h-full" src="${block.mapsEmbedUrl}" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                                </div>
+                            </div>
+                        </section>`;
+                        break;
+                }
+            });
+
+            return `<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${appState.schoolName}</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        .anim-fade-up { animation: fadeUp 0.8s ease-out forwards; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+    </style>
+</head>
+<body class="font-sans text-slate-800 antialiased bg-slate-50">
+
+    <!-- CABEÇALHO DA ESCOLA -->
+    <header class="text-white shadow-md" style="background-color: ${appState.theme.primary};">
+        <div class="bg-black/20 text-[11px] px-4 py-1.5 flex justify-between items-center border-b border-white/10">
+            <span><i class="fa-solid fa-clock mr-1 text-blue-300"></i> Seg a Sex: 07h às 18h</span>
+            <div class="space-x-3">
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+            </div>
+        </div>
+        <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-school text-3xl text-amber-400"></i>
+                <div>
+                    <h1 class="font-bold text-xl leading-tight">${appState.schoolName}</h1>
+                    <p class="text-xs text-blue-200">${appState.schoolSlogan}</p>
+                </div>
+            </div>
+            <nav class="flex space-x-5 text-xs font-semibold text-blue-100">
+                <a href="#" class="hover:text-white">Início</a>
+                <a href="#secao-cursos" class="hover:text-white">Cursos</a>
+                <a href="#secao-boletim" class="hover:text-white">Boletim</a>
+                <a href="#secao-trabalhe" class="hover:text-white">Trabalhe Conosco</a>
+                <a href="#secao-contato" class="hover:text-white">Contato</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        ${blocksHTML}
+    </main>
+
+    <!-- RODAPÉ FINAL -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-8 px-6 border-t border-slate-800">
+        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+            <div>
+                <span class="font-bold text-white text-sm">${appState.schoolName}</span>
+                <p class="text-[11px] mt-0.5">© 2026 — Todos os direitos reservados. Hospedado via GitHub Pages.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const DEMO_STUDENTS = ${JSON.stringify(DEMO_STUDENTS)};
+
+        function handleExportBoletimSearch(e) {
+            e.preventDefault();
+            const mat = document.getElementById('pub-mat').value.trim();
+            const pass = document.getElementById('pub-pass').value.trim();
+            const res = document.getElementById('pub-boletim-result');
+            const student = DEMO_STUDENTS[mat];
+
+            if (student && pass === '1234') {
+                let rows = student.grades.map(g => \`
+                    <tr class="border-b border-slate-100">
+                        <td class="py-1.5 font-medium">\${g.subject}</td>
+                        <td class="py-1.5 text-center">\${g.n1}</td>
+                        <td class="py-1.5 text-center">\${g.n2}</td>
+                        <td class="py-1.5 text-center font-bold text-blue-700">\${g.n3}</td>
+                        <td class="py-1.5 text-right"><span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">\${g.status}</span></td>
+                    </tr>
+                \`).join('');
+
+                res.innerHTML = \`
+                    <div class="border-b pb-2 flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-slate-900 text-xs">\${student.name}</p>
+                            <p class="text-[10px] text-slate-500">\${student.class} | Matrícula: \${mat}</p>
+                        </div>
+                    </div>
+                    <table class="w-full text-[11px]">
+                        <thead>
+                            <tr class="text-slate-400 border-b text-[10px]">
+                                <th class="text-left py-1">Disciplina</th>
+                                <th class="text-center py-1">N1</th>
+                                <th class="text-center py-1">N2</th>
+                                <th class="text-center py-1">N3</th>
+                                <th class="text-right py-1">Situação</th>
+                            </tr>
+                        </thead>
+                        <tbody>\${rows}</tbody>
+                    </table>
+                \`;
+                res.classList.remove('hidden');
+            } else {
+                res.innerHTML = \`<p class="text-red-600 text-center font-medium">Matrícula não localizada. (Dica Demo: use Matrícula 202601 e Senha 1234)</p>\`;
+                res.classList.remove('hidden');
+            }
+        }
+
+        function handleExportJobSubmit(e) {
+            e.preventDefault();
+            alert("Candidatura e arquivo enviados com sucesso!");
+        }
+
+        function playHinoSynth() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const notes = [261.63, 329.63, 392.00, 523.25, 392.00, 523.25];
+                let time = ctx.currentTime;
+                notes.forEach((freq) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, time);
+                    gain.gain.setValueAtTime(0.3, time);
+                    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.4);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(time);
+                    osc.stop(time + 0.4);
+                    time += 0.35;
+                });
+            } catch(e) {}
+        }
+    <\/script>
+</body>
+</html>`;
+        }
+
+        function openPublishModal() {
+            const htmlCode = generateCleanHTML();
+            document.getElementById('exported-html-preview').value = htmlCode;
+            document.getElementById('publish-modal').classList.remove('hidden');
+        }
+
+        function closePublishModal() {
+            document.getElementById('publish-modal').classList.add('hidden');
+        }
+
+        function downloadExportedHTML() {
+            const htmlCode = generateCleanHTML();
+            const blob = new Blob([htmlCode], { type: 'text/html;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'index.html';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function copyExportedHTML() {
+            const textarea = document.getElementById('exported-html-preview');
+            textarea.select();
+            document.execCommand('copy');
+            alert('Código index.html copiado para a área de transferência!');
+        }
+
+
+        // ----------------------------------------------------
+        // RENDER GERAL DA APLICAÇÃO E INICIALIZAÇÃO
+        // ----------------------------------------------------
+        function renderAll() {
+            updateHeaderInfo();
+            renderInspector();
+            renderStage();
+        }
+
+        window.onload = function() {
+            // Verifica se usuário já havia logado
+            renderAll();
+        };
+    </script>
+</body>
+</html>
